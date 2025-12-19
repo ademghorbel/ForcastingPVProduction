@@ -4,13 +4,11 @@ Configuration for the PV Production Dashboard
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+# Force reload environment variables
+load_dotenv(override=True)
 
 # API Configuration
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 # Weather API Settings
 WEATHER_API_BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
@@ -47,8 +45,6 @@ IRRADIATION_THRESHOLD_HIGH = 500  # W/m²
 IRRADIATION_THRESHOLD_MEDIUM = 200  # W/m²
 TEMPERATURE_RANGE = (5, 45)  # Optimal temperature range in Celsius
 
-# LLM Configuration
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")  # "openai", "anthropic", or "gemini"
-LLM_MODEL_ANTHROPIC = "claude-3-5-sonnet-20241022"
-LLM_MODEL_OPENAI = "gpt-4"
-LLM_MODEL_GEMINI = "gemini-1.5-flash"  # Updated: gemini-pro is deprecated
+
+
+
