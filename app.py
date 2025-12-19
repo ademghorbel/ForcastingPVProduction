@@ -1,6 +1,6 @@
 """
-PV Production Dashboard
-Real-time solar production forecasting with weather data integration
+Voltwise - Solar PV Production Dashboard
+Real-time solar production forecasting with AI-powered battery management
 """
 import os
 from dotenv import load_dotenv
@@ -20,11 +20,12 @@ from config import (
 )
 from weather_api import WeatherDataFetcher
 from model_utils import ModelManager, DemoPredictionEngine
+from llm_agent import AIDecisionAgent
 
 # Page configuration
 st.set_page_config(
-    page_title="PV Production Dashboard",
-    page_icon="☀️",
+    page_title="Voltwise - Solar Dashboard",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -81,14 +82,15 @@ def main():
     """Main dashboard application"""
     
     # Header
-    st.title("☀️ PV Production Forecasting Dashboard")
-    st.markdown("Real-time solar production predictions with weather integration")
+    st.title("Voltwise")
+    st.markdown("**AI-Powered Solar Energy & Battery Management Dashboard**")
     
     # Initialize components
     model_manager, prediction_engine, model_status = initialize_components()
     
     # Sidebar configuration
-    st.sidebar.title("⚙️ Configuration")
+    st.sidebar.title("⚙️ Settings")
+    st.sidebar.divider()
     
     # Location input
     st.sidebar.subheader("📍 Location")
@@ -106,7 +108,13 @@ def main():
     st.sidebar.subheader("🤖 Model Status")
     st.sidebar.info(f"Status: {model_status}")
     
-    # Note: AI Decision Agent feature has been disabled
+    # AI Decision Agent toggle
+    st.sidebar.subheader("🤖 Gemini AI Agent")
+    enable_ai = st.sidebar.checkbox("Enable AI Recommendations", value=False, help="Get smart battery management advice powered by Google Gemini")
+    st.session_state['enable_ai'] = enable_ai
+    
+    if enable_ai:
+        st.sidebar.success("✓ AI recommendations enabled")
     
     # Fetch button
     if st.sidebar.button("🔄 Fetch Weather & Predict", use_container_width=True):
@@ -186,7 +194,7 @@ def main():
         current_formatted = st.session_state['current_formatted']
         
         # Current Weather Section
-        st.subheader("🌤️ Current Weather & Production")
+        st.subheader("🌤️ Current Conditions & Solar Output")
         
         col1, col2, col3, col4, col5 = st.columns(5)
         
@@ -231,7 +239,7 @@ def main():
         st.divider()
         
         # Predictions & Forecast
-        st.subheader("📈 Production Forecast - Next 24 Hours")
+        st.subheader("📈 24-Hour Solar Production Forecast")
         
         # Prepare forecast dataframe
         forecast_df = pd.DataFrame({
@@ -372,47 +380,81 @@ def main():
                 f"{np.mean(forecast_df['Temperature (°C)']):.1f}°C",
                 delta=f"Max: {np.max(forecast_df['Temperature (°C)']):.1f}°C"
             )
+        
+        # AI Decision Agent Section
+        if st.session_state.get('enable_ai', False):
+            st.divider()
+            st.subheader("🤖 Gemini AI - Smart Battery Management Insights")
+            st.markdown("*Powered by Google Gemini - Real-time optimization recommendations*")
+            
+            with st.spinner("🔄 Generating AI insights..."):
+                try:
+                    agent = AIDecisionAgent()
+                    
+                    if not agent.initialized:
+                        st.warning(
+                            "⚠️ Gemini Agent not initialized. Please check:\n"
+                            "1. Your GEMINI_API_KEY is set in `.env` file\n"
+                            "2. You have internet connection\n"
+                            "3. Your API quota is not exceeded"
+                        )
+                    else:
+                        recommendations = agent.get_battery_recommendations(
+                            current_prediction=current_prediction,
+                            forecast_predictions=forecast_predictions,
+                            current_weather=current_weather,
+                            forecast_data=forecast_data
+                        )
+                        
+                        # Display recommendations in a nice container
+                        with st.container(border=True):
+                            st.markdown(recommendations)
+                
+                except Exception as e:
+                    st.error(f"❌ Error generating AI insights: {str(e)}")
+                    st.info("Please ensure your Gemini API key is valid and you have internet connection")
     
     else:
         # Initial state
-        st.info("👈 Please configure your location in the sidebar and click 'Fetch Weather & Predict' to begin")
+        st.info("👈 Configure your location in the sidebar and click 'Fetch Weather & Predict' to begin")
         
-        # Info cards
+        # Feature cards
         col1, col2, col3 = st.columns(3)
         
         with col1:
             st.markdown("""
-            ### 🌍 Weather Integration
-            - Real-time weather data from OpenWeatherMap
-            - Irradiation estimation based on cloud coverage
-            - 48-hour forecast for planning
+            ### 🌍 Real-Time Weather
+            - Live weather data integration
+            - Irradiation forecasting
+            - 48-hour predictions
             """)
         
         with col2:
             st.markdown("""
-            ### 📊 Intelligent Predictions
-            - Fine-tuned XGBoost model
-            - Exogenous variables (temperature, humidity, wind)
-            - Hour-by-hour production forecast
+            ### 📊 Smart Predictions
+            - ML-powered forecasts
+            - Accurate production estimates
+            - Hourly breakdowns
             """)
         
         with col3:
             st.markdown("""
-            ### 📊 Data Analysis
-
-            - Power production trends
-            - Weather pattern analysis
-            - Forecast accuracy metrics
+            ### 🤖 AI Optimization
+            - Gemini-powered insights
+            - Battery strategies
+            - Cost savings tips
             """)
         
-        st.warning("⚠️ Setup Required:")
+        st.divider()
+        st.warning("**Getting Started:**")
         st.markdown("""
-        1. **Weather API Key**: Set `WEATHER_API_KEY` in `.env` file
-           - Get free key from [OpenWeatherMap](https://openweathermap.org/api)
-        2. **LLM API Key** (Optional, pick one): 
-           - For Gemini: Set `GEMINI_API_KEY` (recommended, free tier available)
-           - For Claude: Set `ANTHROPIC_API_KEY`
-           - For GPT-4: Set `OPENAI_API_KEY`
+        1. **Set Weather API Key**: Add `WEATHER_API_KEY` to your `.env` file
+           - Get free key: [OpenWeatherMap](https://openweathermap.org/api)
+        2. **Set Gemini API Key** (Optional): Add `GEMINI_API_KEY` to `.env` for AI recommendations
+           - Get free key: [Google AI Studio](https://ai.google.dev/)
+        3. **Enter Location**: Use the sidebar to set your city
+        4. **Run Predictions**: Click "Fetch Weather & Predict"
+        5. **Enable AI** (Optional): Check "Enable AI Recommendations" for Gemini insights
         """)
 
 def display_simple_analysis(current_prediction: float, forecast_predictions: list, current_formatted: dict):
