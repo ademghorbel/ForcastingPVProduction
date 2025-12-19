@@ -229,29 +229,12 @@ Created for solar energy research and production forecasting.
 **Last Updated**: December 2025  
 **Model Status**: ✅ Fine-tuned XGBoost with exogenous features loaded  
 **Dashboard Status**: ✅ Fully operational  
-**AI Features**: Removed (focus on core forecasting)
+**AI Features**: Removed (focus on core forecasting due to limitation of api key usage)
 
 
 ---
 
-## 🎯 Use Cases
 
-### Solar Farm Operators
-- Forecast daily production for planning
-- Optimize battery charging/discharging
-- Plan maintenance windows
-
-### Energy Storage Managers
-- Predict when to charge/discharge storage
-- Maximize revenue from load shifting
-- Meet grid demand forecasts
-
-### Researchers
-- Analyze weather impact on production
-- Validate ML model predictions
-- Develop improved forecasting models
-
----
 
 ## 📊 Model Performance & Example Predictions
 
@@ -333,32 +316,5 @@ Expected Accuracy: ±0.26 kW (based on test MAE)
 
 ---
 
-## 🔄 Next Steps
-
-1. **First Run**: Test with demo location (Sfax, Tunisia)
-2. **Add Your Location**: Update to your solar site
-3. **Fine-tune Model**: Retrain with your local historical data
-4. **Set Up Alerts**: Integrate with your monitoring system
-5. **Deploy**: Host on cloud (Heroku, Azure, AWS)
-
----
-
-## 💬 Support
-
-For issues or questions:
-1. Check the troubleshooting section above
-2. Review `config.py` for configuration options
-3. Check browser console (F12) for errors
-4. Enable debug logging: `streamlit run app.py --logger.level=debug`
-
----
-
-## 📝 License
-
-This project is provided as-is for educational and commercial use.
-
----
-
-**Last Updated**: December 18, 2025  
 **Python Version**: 3.8+  
 **Framework**: Streamlit 1.28.1
