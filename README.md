@@ -64,30 +64,86 @@ See **AI_RECOMMENDATION_GUIDE.md** for complete documentation.
 ### Prerequisites
 - Python 3.8+
 - Virtual environment: `.venv\Scripts\activate` (Windows) or `source .venv/bin/activate` (Linux/Mac)
-- OpenWeatherMap API key (free tier: https://openweathermap.org/api)
+- Two API keys (both FREE tier available)
 
-### 1. Get Your Weather API Key
-1. Visit [OpenWeatherMap](https://openweathermap.org/api)
-2. Sign up for free account
-3. Copy your API key
+### ⚙️ Step 1: Get Your OpenWeatherMap API Key
 
-### 2. Configure Environment
-Create `.env` file in project root:
+1. **Visit** [OpenWeatherMap API](https://openweathermap.org/api)
+2. **Click** "Sign Up" → Create free account
+3. **Verify** email address
+4. **Go to** [API Keys tab](https://home.openweathermap.org/api_keys)
+5. **Copy** your default API key (starts with alphanumeric)
+6. **Save it** - you'll need it for `.env`
+
+**Free Tier Includes**:
+- 1,000 calls/day
+- 24-hour forecasts
+- Current weather data
+- Historical data
+
+### ⚙️ Step 2: Get Your OpenRouter API Key (For AI Recommendations)
+
+1. **Visit** [OpenRouter.ai](https://openrouter.ai)
+2. **Click** "Sign Up" → Create free account (via GitHub/Google recommended)
+3. **Go to** [API Keys](https://openrouter.ai/keys)
+4. **Create** new API key (click button)
+5. **Copy** the full key (starts with `sk-or-v1-`)
+6. **Save it** - you'll need it for `.env`
+
+**Free Tier Includes**:
+- Access to free models like OLMo-3.1-32B
+- First $5 monthly credits
+- Perfect for testing and demos
+
+**Alternative Models** (if primary doesn't work):
+- `nvidia/nemotron-3-nano-30b-a3b:free` - Fast, lightweight
+- `meta-llama/llama-2-70b-chat:free` - Reliable alternative
+
+### 📝 Step 3: Configure Environment Variables
+
+Create `.env` file in project root with your actual keys:
+
 ```env
-WEATHER_API_KEY=your_openweathermap_api_key_here
+# OpenWeatherMap API Key (Get from: https://openweathermap.org/api)
+WEATHER_API_KEY=your_actual_openweathermap_key_here
+
+# OpenRouter API Key (Get from: https://openrouter.ai/keys)
+OPENROUTER_API_KEY=your_actual_openrouter_key_here
+
+# AI Model (use free tier models from OpenRouter)
+OPENROUTER_MODEL=allenai/olmo-3.1-32b-think:free
 ```
 
-### 3. Install Dependencies
+**⚠️ Security**: Never commit `.env` to git - it contains sensitive credentials!
+
+### 📦 Step 4: Create Virtual Environment & Install
+
 ```bash
+# Create virtual environment
+python -m venv .venv
+
+# Activate virtual environment
+# On Windows:
+.venv\Scripts\activate
+# On Linux/Mac:
+source .venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 4. Launch Dashboard
+### 🚀 Step 5: Launch Dashboard
+
 ```bash
 streamlit run app.py
 ```
 
 Dashboard opens at: `http://localhost:8501`
+
+**Troubleshooting**:
+- If port 8501 is busy: `streamlit run app.py --server.port 8502`
+- If API errors: Check `.env` file has correct keys with no extra spaces
+- See **Troubleshooting** section below for more help
 
 ---
 
