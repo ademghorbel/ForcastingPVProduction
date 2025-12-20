@@ -16,10 +16,11 @@ import plotly.graph_objects as go
 import plotly.express as px
 from config import (
     IRRADIATION_THRESHOLD_HIGH, IRRADIATION_THRESHOLD_MEDIUM,
-    WEATHER_CONDITIONS
+    WEATHER_CONDITIONS, OPENROUTER_API_KEY
 )
 from weather_api import WeatherDataFetcher
 from model_utils import ModelManager, DemoPredictionEngine
+from energy_recommendation_agent import EnergyRecommendationAgent
 
 # Page configuration
 st.set_page_config(
@@ -99,9 +100,47 @@ def main():
     with col2:
         country = st.text_input("Country Code", value="TN", max_chars=2, key="country_input").strip().upper()
     
-    # Show tip for city selection
-    with st.sidebar:
-        st.caption("💡 Tip: Use exact city spelling (e.g., 'Hammamet' not 'hammemet')")
+    # Battery Storage Configuration
+    st.sidebar.subheader("🔋 Battery Storage")
+    has_battery = st.sidebar.checkbox("Enable Battery Storage", value=False, key="has_battery")
+    
+    if has_battery:
+        battery_capacity = st.sidebar.number_input(
+            "Battery Capacity (kWh)",
+            min_value=1.0,
+            max_value=100.0,
+            value=10.0,
+            step=0.5,
+            key="battery_capacity"
+        )
+        battery_level = st.sidebar.slider(
+            "Current Battery Level (%)",
+            min_value=0,
+            max_value=100,
+            value=50,
+            step=5,
+            key="battery_level"
+        )
+        daily_consumption = st.sidebar.number_input(
+            "Daily Consumption (kWh)",
+            min_value=1.0,
+            max_value=200.0,
+            value=20.0,
+            step=1.0,
+            key="daily_consumption"
+        )
+        
+        # Calculate actual battery level in kWh
+        battery_current_kwh = (battery_level / 100) * battery_capacity
+        
+        st.sidebar.info(
+            f"**Battery Status:**\n"
+            f"- Capacity: {battery_capacity} kWh\n"
+            f"- Current: {battery_current_kwh:.2f} kWh\n"
+            f"- Available: {battery_capacity - battery_current_kwh:.2f} kWh"
+        )
+    
+    st.sidebar.divider()
     
     # Model status
     st.sidebar.subheader("🤖 Model Status")
@@ -291,6 +330,126 @@ def main():
         # Power Analysis
         st.subheader("⚡ Power Production Analysis")
         display_simple_analysis(current_prediction, forecast_predictions, current_formatted)
+        
+        st.divider()
+        
+        # AI-Powered Battery Recommendation Agent
+        if st.session_state.get('has_battery', False) and OPENROUTER_API_KEY:
+            st.subheader("🤖 AI Energy Recommendation Agent")
+            st.markdown("*Expert analysis using OpenRouter API Agent with persona prompting*")
+            
+            if st.button("💡 Get AI Recommendation", use_container_width=True, key="get_recommendation"):
+                with st.spinner("🔍 Analyzing forecast data and generating recommendation..."):
+                    try:
+                        # Initialize the recommendation agent
+                        agent = EnergyRecommendationAgent(OPENROUTER_API_KEY)
+                        
+                        # Prepare battery parameters
+                        battery_capacity = st.session_state.get('battery_capacity', 10.0)
+                        battery_level_percent = st.session_state.get('battery_level', 50)
+                        battery_current_kwh = (battery_level_percent / 100) * battery_capacity
+                        daily_consumption = st.session_state.get('daily_consumption', 20.0)
+                        
+                        # Get AI recommendation
+                        recommendation_result = agent.analyze_forecast_and_recommend(
+                            current_production=float(current_prediction),
+                            forecast_data=forecast_data,
+                            battery_capacity=battery_capacity,
+                            battery_current_level=battery_current_kwh,
+                            daily_consumption_kwh=daily_consumption,
+                            has_battery_storage=True
+                        )
+                        
+                        # Store in session state for display
+                        st.session_state['recommendation_result'] = recommendation_result
+                        st.success("✓ Recommendation generated!")
+                        st.rerun()
+                        
+                    except Exception as e:
+                        st.error(f"❌ Error generating recommendation: {str(e)}")
+                        st.info("Make sure you have set the GEMINI_API_KEY in your .env file")
+            
+            # Display recommendation if available
+            if 'recommendation_result' in st.session_state:
+                rec = st.session_state['recommendation_result']
+                
+                if rec['status'] == 'success':
+                    recommendation = rec.get('recommendation', {})
+                    
+                    # Display action in prominent style
+                    action = recommendation.get('action', 'MAINTAIN')
+                    confidence = recommendation.get('confidence', 'Medium')
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        # Color code based on action
+                        if action == "CHARGE":
+                            color = "🟢"
+                            action_text = "CHARGE BATTERY"
+                        elif action == "DISCHARGE":
+                            color = "🔴"
+                            action_text = "DISCHARGE BATTERY"
+                        else:
+                            color = "🟡"
+                            action_text = "MAINTAIN STATUS"
+                        
+                        st.markdown(f"### {color} {action_text}")
+                    
+                    with col2:
+                        st.metric("Confidence Level", confidence)
+                    
+                    with col3:
+                        st.metric("Timestamp", rec['timestamp'][:10])
+                    
+                    st.divider()
+                    
+                    # Display full analysis
+                    st.subheader("📋 Expert Analysis")
+                    
+                    with st.expander("View Full AI Analysis", expanded=True):
+                        analysis_text = recommendation.get('full_analysis', '')
+                        # Always show the full analysis - this is what the AI actually said
+                        if analysis_text:
+                            st.markdown(analysis_text)
+                        else:
+                            st.warning("No analysis text available")
+                    
+                    # Display battery info
+                    battery_info = rec.get('battery_info', {})
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.metric(
+                            "Battery Level",
+                            f"{battery_info.get('charge_percentage', 0):.1f}%",
+                            f"{battery_info.get('current_level_kwh', 0):.2f} kWh"
+                        )
+                    
+                    with col2:
+                        st.metric(
+                            "Battery Capacity",
+                            f"{battery_info.get('capacity_kwh', 0):.2f} kWh"
+                        )
+                    
+                    with col3:
+                        available = (battery_info.get('capacity_kwh', 0) - 
+                                   battery_info.get('current_level_kwh', 0))
+                        st.metric(
+                            "Available Capacity",
+                            f"{available:.2f} kWh"
+                        )
+                
+                elif rec['status'] == 'error':
+                    st.error(f"Error: {rec.get('message', 'Unknown error')}")
+        
+        elif st.session_state.get('has_battery', False) and not OPENROUTER_API_KEY:
+            st.warning(
+                "🔑 **OpenRouter API Key Required**\n\n"
+                "To enable AI-powered recommendations, please add:\n"
+                "`OPENROUTER_API_KEY=your_key_here` to your `.env` file\n"
+                "and restart the application"
+            )
         
         st.divider()
         

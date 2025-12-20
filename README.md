@@ -10,7 +10,29 @@ This project provides:
 - **Interactive Streamlit dashboard** with live charts and analytics
 - **24-hour production forecasts** with weather correlation analysis
 
-**Status**: ✅ Fully operational with trained XGBoost model
+**Status**: ✅ Fully operational with trained XGBoost model + AI-powered battery recommendations
+
+---
+
+## ✨ NEW: AI Energy Recommendation Agent
+
+The dashboard now includes an **intelligent AI-powered battery management system** powered by OpenRouter API:
+
+### 🤖 Key Features
+- **Expert AI Analysis**: Uses advanced LLM (OLMo-3.1-32B) with persona prompting as energy analyst
+- **Weather-Based Recommendations**: Analyzes 24-hour forecasts to suggest CHARGE/DISCHARGE/MAINTAIN
+- **Battery Optimization**: Considers capacity, current level, consumption patterns, and weather conditions
+- **Confidence Levels**: Provides High/Medium/Low confidence based on forecast certainty
+- **Detailed Reasoning**: Full explanation of decision logic with specific numbers and considerations
+
+### 📚 Usage
+1. Enable **"🔋 Battery Storage"** in sidebar
+2. Configure battery capacity, level, and daily consumption
+3. Fetch weather data for your location
+4. Click **"💡 Get AI Recommendation"** button
+5. Review AI's expert analysis and recommendation
+
+See **AI_RECOMMENDATION_GUIDE.md** for complete documentation.
 
 ---
 
@@ -22,10 +44,12 @@ This project provides:
 ├── config.py                       # Configuration and constants
 ├── weather_api.py                  # OpenWeatherMap API integration
 ├── model_utils.py                  # XGBoost model loading and prediction
+├── energy_recommendation_agent.py  # AI-powered battery recommendation agent
 ├── best_model_exogenous.pkl        # Fine-tuned XGBoost model (trained)
 ├── project_scaler.pkl              # Feature scaler for preprocessing
 ├── BDDsfax.xlsx                    # Training dataset (Sfax, Tunisia)
 ├── projet_ML (1).ipynb             # ML model development notebook
+├── AI_RECOMMENDATION_GUIDE.md       # AI agent integration documentation
 ├── .env                            # Environment variables (API keys)
 ├── requirements.txt                # Python dependencies
 ├── logo white.png                  # Dashboard logo
@@ -71,14 +95,30 @@ Dashboard opens at: `http://localhost:8501`
 
 ### Basic Workflow
 1. **Enter Location**: City name + country code (e.g., "Sfax", "TN")
-2. **Click "Fetch Weather & Predict"**
-3. **View Results**:
+2. **(Optional) Enable Battery Storage**: Configure battery settings in sidebar
+3. **Click "Fetch Weather & Predict"**
+4. **View Results**:
    - Current conditions (temp, humidity, wind, clouds)
    - 24-hour production forecast chart
    - Detailed forecast table with predictions
    - Statistical analysis (avg, peak, total energy)
+   - **(NEW) AI Recommendation**: Get intelligent battery management advice
 
 ### Dashboard Sections
+
+#### 🔋 Battery Storage Configuration (NEW)
+- Enable/disable battery management features
+- Set battery capacity (kWh)
+- Adjust current charge level (%)
+- Input daily consumption estimate
+- View available storage capacity
+
+#### 🤖 AI Energy Recommendation Agent (NEW)
+- Click **"💡 Get AI Recommendation"** to analyze weather and battery status
+- Receives recommendation: **🟢 CHARGE**, **🔴 DISCHARGE**, or **🟡 MAINTAIN**
+- Reviews detailed expert analysis explaining the decision
+- Confidence level (High/Medium/Low) based on forecast certainty
+- Considers battery capacity, consumption patterns, and weather trends
 
 #### 🌤️ Current Conditions
 - Temperature, humidity, wind speed, cloud coverage
@@ -98,6 +138,8 @@ Dashboard opens at: `http://localhost:8501`
 #### 📊 Statistics & Analysis
 - Average power (24h)
 - Peak power prediction + time
+- Total estimated energy (kWh)
+- Average temperature with min/max
 - Total estimated energy (kWh)
 - Average temperature with min/max
 
@@ -152,7 +194,9 @@ To retrain the model:
 
 ### .env Variables
 ```env
-WEATHER_API_KEY=your_api_key_here          # Required: OpenWeatherMap API key
+WEATHER_API_KEY=your_openweathermap_key    # Required: OpenWeatherMap API key
+OPENROUTER_API_KEY=your_openrouter_key     # Required: OpenRouter API key (for AI recommendations)
+OPENROUTER_MODEL=allenai/olmo-3.1-32b-think:free  # LLM model for AI agent
 ```
 
 ### Model Configuration (config.py)
@@ -160,6 +204,8 @@ WEATHER_API_KEY=your_api_key_here          # Required: OpenWeatherMap API key
 - `WEATHER_FORECAST_URL` - OpenWeatherMap forecast endpoint
 - `MODEL_PATH` - Path to trained model file
 - `FEATURE_COLUMNS_EXOGENOUS` - Features expected by model
+- `OPENROUTER_API_KEY` - API key for AI recommendations
+- `OPENROUTER_MODEL` - LLM model identifier
 
 ### Thresholds
 - `IRRADIATION_THRESHOLD_HIGH` = 500 W/m²
@@ -174,6 +220,7 @@ WEATHER_API_KEY=your_api_key_here          # Required: OpenWeatherMap API key
 |-----------|-----------|
 | **Frontend** | Streamlit 1.28.1 |
 | **ML Model** | XGBoost 2.0.3 |
+| **AI Engine** | OpenRouter.ai + OLMo-3.1-32B LLM |
 | **Data Processing** | Pandas, NumPy, Scikit-learn |
 | **Visualization** | Plotly 5.18.0 |
 | **Weather API** | OpenWeatherMap REST API |
@@ -189,7 +236,7 @@ See `requirements.txt` for full list:
 - pandas - Data manipulation
 - numpy - Numerical computing
 - plotly - Interactive charts
-- requests - HTTP requests
+- requests - HTTP requests (for API calls)
 - python-dotenv - Environment management
 
 Install all: `pip install -r requirements.txt`
@@ -214,6 +261,14 @@ Install all: `pip install -r requirements.txt`
 2. Create `.env` file with: `WEATHER_API_KEY=your_key_here`
 3. Restart app: `streamlit run app.py`
 
+### "AI Recommendation not working"
+**Solution**:
+1. Get free OpenRouter API key from [OpenRouter.ai](https://openrouter.ai)
+2. Add to `.env`: `OPENROUTER_API_KEY=your_key_here`
+3. Ensure battery storage is enabled in sidebar
+4. Restart app: `streamlit run app.py`
+5. See **AI_RECOMMENDATION_GUIDE.md** for detailed setup
+
 ---
 
 ## 📝 License
@@ -228,8 +283,8 @@ Created for solar energy research and production forecasting.
 
 **Last Updated**: December 2025  
 **Model Status**: ✅ Fine-tuned XGBoost with exogenous features loaded  
-**Dashboard Status**: ✅ Fully operational  
-**AI Features**: Removed (focus on core forecasting due to limitation of api key usage)
+**Dashboard Status**: ✅ Fully operational with AI recommendations  
+**AI Features**: ✅ OpenRouter.ai powered energy recommendations (Dec 20, 2025)
 
 
 ---
@@ -310,11 +365,11 @@ Expected Accuracy: ±0.26 kW (based on test MAE)
 | Core Application | ✅ Working | Tested and validated |
 | Weather API | ✅ Working | Requires valid API key |
 | ML Model | ✅ Working | Pre-trained XGBoost |
-| Gemini AI | ✅ Working | Requires API key |
-| Claude AI | ✅ Working | Requires API key |
-| GPT-4 AI | ✅ Working | Requires API key |
+| AI Recommendations | ✅ NEW! | OpenRouter.ai powered |
+| Battery Management | ✅ NEW! | AI-optimized charging strategy |
 
 ---
 
 **Python Version**: 3.8+  
-**Framework**: Streamlit 1.28.1
+**Framework**: Streamlit 1.28.1  
+**Latest Update**: December 20, 2025 - Added AI Energy Recommendation Agent

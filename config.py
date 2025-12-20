@@ -9,6 +9,8 @@ load_dotenv(override=True)
 
 # API Configuration
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-3.5-turbo")
 
 # Weather API Settings
 WEATHER_API_BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
