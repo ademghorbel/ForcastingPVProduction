@@ -421,8 +421,8 @@ Expected Accuracy: ±0.26 kW (based on test MAE)
 | Core Application | ✅ Working | Tested and validated |
 | Weather API | ✅ Working | Requires valid API key |
 | ML Model | ✅ Working | Pre-trained XGBoost |
-| AI Recommendations | ✅ NEW! | OpenRouter.ai powered |
-| Battery Management | ✅ NEW! | AI-optimized charging strategy |
+| AI Recommendations | ✅ NEW | OpenRouter.ai powered |
+| Battery Management | ✅ NEW | AI-optimized charging strategy |
 
 ---
 

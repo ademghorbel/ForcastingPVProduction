@@ -2,7 +2,7 @@
 
 ## Overview
 
-Your Voltwise Solar Dashboard now includes an **AI-powered Energy Recommendation Agent** that uses Google's Gemini API with persona prompting to provide expert battery management recommendations.
+Your Voltwise Solar Dashboard now includes an **AI-powered Energy Recommendation Agent** that uses OpenRouter.ai with persona prompting to provide expert battery management recommendations.
 
 ## What's New
 
@@ -57,11 +57,13 @@ The AI provides:
 
 ## How to Use
 
-### Step 1: Add Gemini API Key
-The API key has already been added to your `.env` file:
+### Step 1: Add OpenRouter API Key
+Add your OpenRouter API key to your `.env` file:
 ```
-GEMINI_API_KEY=AIzaSyCWeabwE5gBOUskP7j3iwWw4hwbxrmw2TI
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_MODEL=allenai/olmo-3.1-32b-think:free
 ```
+Get your free API key from: [OpenRouter.ai](https://openrouter.ai/keys)
 
 ### Step 2: Configure Battery Storage
 1. Enable **"🔋 Enable Battery Storage"** in sidebar
@@ -147,13 +149,13 @@ Timing: Monitor conditions hourly, be ready to switch strategies
 ### Environment Variables (.env)
 ```
 WEATHER_API_KEY=your_openweathermap_key
-GEMINI_API_KEY=AIzaSyCWeabwE5gBOUskP7j3iwWw4hwbxrmw2TI
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_MODEL=allenai/olmo-3.1-32b-think:free
 ```
 
-### Dependencies Added
-```
-google-generativeai==0.3.0
-```
+### API Providers
+- **Weather Data**: [OpenWeatherMap](https://openweathermap.org/api) (Free tier: 1,000 calls/day)
+- **AI Recommendations**: [OpenRouter.ai](https://openrouter.ai) (Free tier: $5 monthly credits)
 
 ## Features in Detail
 
@@ -206,25 +208,26 @@ Hour | Temp(°C) | Cloud% | Wind(m/s) | Condition | Humidity%
 
 ## Troubleshooting
 
-### Issue: "Gemini API Key Required"
+### Issue: "OpenRouter API Key Required"
 **Solution**: 
-1. Make sure `GEMINI_API_KEY` is in `.env`
+1. Make sure `OPENROUTER_API_KEY` is in `.env`
 2. Restart the Streamlit app
-3. Check API key is valid at [Google AI Studio](https://makersuite.google.com/app/apikey)
+3. Get free API key from [OpenRouter.ai](https://openrouter.ai/keys)
+4. Verify the key starts with `sk-or-v1-`
 
 ### Issue: "Error generating recommendation"
 **Solution**:
 1. Verify internet connection
-2. Check API key has quota remaining
+2. Check API key is valid at [OpenRouter.ai Dashboard](https://openrouter.ai)
 3. Ensure weather data was fetched successfully
-4. Check .env file is properly formatted
+4. Check .env file is properly formatted (no extra spaces)
 
 ### Issue: Recommendation takes too long
 **Solution**:
-1. This is normal (2-10 seconds) for first request
-2. Subsequent requests should be faster
+1. This is normal (2-10 seconds) for first request using thinking models
+2. Subsequent requests should be faster (5-8 seconds)
 3. Check your internet connection speed
-4. Verify Gemini API service status
+4. Verify OpenRouter API service status at [openrouter.ai](https://openrouter.ai)
 
 ## Next Steps
 
@@ -244,8 +247,8 @@ Hour | Temp(°C) | Cloud% | Wind(m/s) | Condition | Humidity%
 
 ## Support Resources
 
-- [Google Generative AI Docs](https://ai.google.dev/)
-- [Gemini API Guide](https://ai.google.dev/tutorials)
+- [OpenRouter.ai Documentation](https://openrouter.ai/docs)
+- [OpenRouter API Guide](https://openrouter.ai/docs/guides)
 - [OpenWeatherMap API](https://openweathermap.org/api)
 - [Streamlit Documentation](https://docs.streamlit.io/)
 
