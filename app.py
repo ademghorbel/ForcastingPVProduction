@@ -88,6 +88,10 @@ def main():
     # Initialize components
     model_manager, prediction_engine, model_status = initialize_components()
     
+    # Initialize session state for first-time setup
+    if 'dashboard_initialized' not in st.session_state:
+        st.session_state['dashboard_initialized'] = False
+    
     # Sidebar configuration
     st.sidebar.title("⚙️ Settings")
     st.sidebar.divider()
@@ -207,6 +211,7 @@ def main():
                 st.session_state['forecast_formatted'] = forecast_formatted
                 st.session_state['forecast_predictions'] = forecast_predictions
                 st.session_state['fetch_data'] = False
+                st.session_state['dashboard_initialized'] = True
                 st.success("✓ Data fetched successfully!")
                 st.rerun()
             
@@ -534,45 +539,72 @@ def main():
 
     
     else:
-        # Initial state
-        st.info("👈 Configure your location in the sidebar and click 'Fetch Weather & Predict' to begin")
+        # Initial state - Setup Guide
+        st.success("✨ Welcome to Voltwise Dashboard!")
         
-        # Feature cards
+        st.markdown("""
+        ### 🚀 Quick Start Guide
+        
+        Your solar energy forecasting dashboard is ready. Follow these steps to get started:
+        """)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.subheader("⚙️ Step 1: Configure Settings")
+            st.markdown("""
+            - **📍 Location**: Enter your city name and country code
+            - **🔋 Battery**: Enable battery storage (optional)
+            - Check **Model Status** on the sidebar
+            """)
+        
+        with col2:
+            st.subheader("🔄 Step 2: Fetch Data")
+            st.markdown("""
+            - Click the **"Fetch Weather & Predict"** button
+            - Dashboard will load real-time weather data
+            - AI predictions will be generated automatically
+            """)
+        
+        st.divider()
+        
+        st.subheader("📊 What You'll See After Fetching:")
+        
         col1, col2, col3 = st.columns(3)
         
         with col1:
             st.markdown("""
-            ### 🌍 Real-Time Weather
-            - Live weather data integration
-            - Irradiation forecasting
-            - 48-hour predictions
+            ### 🌤️ Current Conditions
+            - Temperature & Humidity
+            - Wind Speed & Cloud Cover
+            - Solar Production (kW)
             """)
         
         with col2:
             st.markdown("""
-            ### 📊 Smart Predictions
-            - ML-powered forecasts
-            - Accurate production estimates
-            - Hourly breakdowns
+            ### 📈 24-Hour Forecast
+            - Hourly power predictions
+            - Weather conditions
+            - Production analysis
             """)
         
         with col3:
             st.markdown("""
-            ### 📊 Advanced Analytics
-            - Historical trends
-            - Performance metrics
-            - Detailed insights
+            ### 🤖 AI Recommendations
+            - Smart battery management
+            - Charge/discharge advice
+            - Energy optimization
             """)
         
         st.divider()
-        st.warning("**Getting Started:**")
-        st.markdown("""
-        1. **Set Weather API Key**: Add `WEATHER_API_KEY` to your `.env` file
-           - Get free key: [OpenWeatherMap](https://openweathermap.org/api)
-        2. **Enter Location**: Use the sidebar to set your city
-        3. **Run Predictions**: Click "Fetch Weather & Predict"
-        4. **View Results**: See detailed forecasts and analysis
-        """)
+        st.info("""
+        **✓ Setup Status:**
+        - Weather API: ✅ Configured
+        - OpenRouter API: ✅ Configured
+        - Model: {} 
+        
+        You're ready to start! Click the button in the sidebar →
+        """.format(model_status))
 
 def display_simple_analysis(current_prediction: float, forecast_predictions: list, current_formatted: dict):
     """Display simple power production analysis"""
