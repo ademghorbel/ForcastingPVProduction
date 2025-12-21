@@ -2,7 +2,7 @@
 
 ## Overview
 
-Your Voltwise Solar Dashboard now includes an **AI-powered Energy Recommendation Agent** that uses OpenRouter.ai with persona prompting to provide expert battery management recommendations.
+Voltwise Solar Dashboard now includes an **AI-powered Energy Recommendation Agent** that uses OpenRouter.ai with persona prompting to provide expert battery management recommendations.
 
 ## What's New
 
@@ -41,7 +41,7 @@ Example Configuration:
 ### 3. **AI Recommendation Button**
 
 After fetching weather data, click **"💡 Get AI Recommendation"** to:
-1. Send weather forecast + battery data to Gemini AI
+1. Send weather forecast + battery data to Olmo Model AI
 2. Get detailed expert analysis
 3. Receive actionable recommendation: **CHARGE**, **DISCHARGE**, or **MAINTAIN**
 
